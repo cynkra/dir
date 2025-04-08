@@ -53,6 +53,16 @@ Sure, there you go:
 
 https//github.com/cynkra/dir.example
 
+## Minor annoyances
+
+- `devtools::document()` won’t work as intended, it will mess with your
+  doc and NAMESPACE file, but you don’t need it, use only `load_all()`.
+  If you call it by mistake `load_all()` will repair the mess.
+- `devtools::check()` runs `document()` at the end of the checks, that
+  messes with the doc and the NAMESPACE file as well. The check itself
+  is not affected though, here as well `load_all()` will clean up the
+  mess.
+
 ## History
 
 This had been
