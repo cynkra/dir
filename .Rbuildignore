@@ -1,0 +1,11 @@
+^dir\.Rproj$
+^\.Rproj\.user$
+# dir::add() end
+^README\.Rmd$
+# dir::add() start
+^R2$
+# dir::add() end
+# dir::add() start
+^R2$
+# dir::add() end
+^LICENSE\.md$

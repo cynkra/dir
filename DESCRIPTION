@@ -1,0 +1,23 @@
+Package: dir
+Title: Use a nested folder structure in your package.
+Version: 1.1.0.9000
+Authors@R: c(
+    person("Antoine", "Fabri", , "antoine.fabri@gmail.com", role = c("aut", "cre")),
+    person("cynkra GmbH", , , "mail@cynkra.com", role = "fnd",
+           comment = c(ROR = "0335t7e62"))
+  )
+Description: Use 'dir::add()' in your '.onload()' definition and enjoy using a
+  nested folder structure to store your code.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2.9000
+Depends: 
+    R (>= 3.5)
+Imports: 
+    here,
+    pkgload,
+    rlang,
+    roxygen2,
+    usethis,
+    withr
