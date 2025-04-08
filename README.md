@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# dir
+# dir <img src="man/figures/logo.png" align="right" height="120" alt="" />
 
 {dir} allows you to store your code in a nested folder structure, rather
 than solely in the “R” folder.
