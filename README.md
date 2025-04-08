@@ -49,9 +49,7 @@ pak::pak("cynkra/dir")
 
 ## Do you have an example ?
 
-Sure, there you go:
-
-https//github.com/cynkra/dir.example
+Sure, [there you go!](https://github.com/cynkra/dir.example)
 
 ## Minor annoyances
 
