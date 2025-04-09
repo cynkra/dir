@@ -41,7 +41,7 @@ pak::pak("cynkra/dir")
 
 - Add the ‘dir’ package to your “Suggests” dependencies in the
   “DESCRIPTION” file.
-- Add your added folders to “.Rbuidignore”
+- Add your added folders to “.Rbuildignore”
 - Load the code from your added folders into the `sysdata.rda` file in
   the R folder.
 - Load the objects into the session
