@@ -17,6 +17,29 @@ knitr::opts_chunk$set(
 
 {dir} allows you to store your code in a nested folder structure, rather than
  solely in the "R" folder.
+ 
+Set it up with one line of boiler plate code as explained in the setup section, from there on calling `devtools::load_all()` will:
+
+* Load the code from the R folder AND your added folders (recursively into nested folders by default)
+* `document()` everything, so no need to call `devtools::document()` (In fact calling
+  the latter will undocument some objects, an unfortunate side effect of the magic we use)
+ 
+Files and folders starting with "_" or "." in your added folders will be ignored by the process.
+
+{dir} won't be needed by the end users of your package, and yes your package is CRAN compliant.
+
+## Installation
+
+Install with:
+
+``` r
+pak::pak("cynkra/dir")
+```
+
+## Setup
+
+To set this up, you need to trigger a call to `dir::add()` for developers only.
+There are 2 ways to do it, through `.onLoad()` or through a local ".RProfile".
 
 To do so you might for instance have in your "zzz.R" file:
 
@@ -26,23 +49,10 @@ To do so you might for instance have in your "zzz.R" file:
 }
 ```
 
-Then use `devtools::load_all()` as you would normally, now it will load also the
-code from your added folders (recursively into nested folders by default).
+Or have this line in your local ".RProfile" (`usethis::edit_r_profile("project")`) 
 
-`devtools::load_all()` will now also take care of the documentation so no need
-to call `devtools::document()` (and if you do, it will delete some ".Rd" files,
-we found no way around it).
- 
-Files and folders starting with "_" in your added folders will be ignored by the process.
-
-`dir:add()` will never be called by your end users.
-
-## Installation
-
-Install with:
-
-``` r
-pak::pak("cynkra/dir")
+```r
+setHook(packageEvent("your.package.name", "onLoad"), function(...) dir::add("new_top_level_folder", "maybe_another_one"))
 ```
 
 ## How does it work?

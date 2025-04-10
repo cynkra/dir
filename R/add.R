@@ -73,7 +73,8 @@ add <- function(..., .recursive = TRUE) {
   # update sysdata.rda =========================================================
   e <- new.env()
   for (file in files) source(file, local = e)
-  ns <- topenv(parent.frame())
+  ns <- asNamespace(pkgload::pkg_name())
+
   # set environment of functions and env formulas to ns
   objs <- eapply(e, function(x) {
     if (is.function(x) || rlang::is_formula("formula")) {
@@ -85,7 +86,15 @@ add <- function(..., .recursive = TRUE) {
 
   # update the namespace with these values =====================================
   # sysdata.rda was already read when we call add() so we move them to the namespace manually
+  rlang::env_unlock(ns)
+  for (nm in intersect(names(objs), names(ns))) {
+      unlockBinding(nm, ns)
+  }
   list2env(objs, ns)
+  for (nm in names(objs)) {
+    lockBinding(nm, ns)
+  }
+  rlang::env_lock(ns)
 
   # document ===================================================================
   renamed_files <- file.path("R", gsub("/", "--", files))
