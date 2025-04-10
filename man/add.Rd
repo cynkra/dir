@@ -4,45 +4,20 @@
 \alias{add}
 \title{Add Folders to a R package}
 \usage{
-add(..., .recursive = TRUE)
+add(..., recursive = TRUE, patch = FALSE)
 }
 \arguments{
-\item{...}{Folders to add. You might provide strings, vectors or lists, they
-will be flattened into a vector.}
+\item{...}{Folders to add. You might provide strings, vectors or lists, they will be flattened into a vector.}
 
-\item{.recursive}{Boolean. Whether to add folders under the added folders recursively.}
+\item{recursive}{Boolean. Whether to add folders under the added folders recursively.}
+
+\item{patch}{Boolean. Whether to patch some 'usethis' and 'devtools' functions so they
+work with 'dir'. Recommended but since it is invasive it defaults to \code{FALSE}.
+Forwarded to \code{dir::add()}}
 }
 \description{
-\code{add()} allows you to store your code in a nested folder structure, rather than
-solely in the "R" folder. To do so:
-\itemize{
-\item Have a call to \code{dir::add()} in your \code{.onLoad()} definition as shown
-in the examples at the bottom of this page.
-\item Call \code{devtools::load_all()} in your workflow, and never \code{devtools::document()}.
-Indeed \code{load_all()} will document everything through \code{dir::add()}, and
-\code{devtools::document()} would drop some ".Rd" files.
-}
-
-Files and folders starting with "_" in your added folders will be ignored by the process.
-}
-\section{How does it work?}{
-
-
-\code{dir::add()} will:
-\itemize{
-\item Add the 'dir' package to your "Suggests" dependencies in the "DESCRIPTION" file.
-\item Add your added folders to ".Rbuidignore"
-\item Load the code from your added folders into the \code{sysdata.rda} file in the R folder.
-\item Load the objects into the session
-\item Document everything, like \code{devtools::document()}
-}
-}
-
-\examples{
-\dontrun{
-.onLoad <- function(libname, pkgname) {
-  # the condition makes sure this is run only during development
-  if (Sys.getenv("DEVTOOLS_LOAD") == pkgname) dir::add("new_top_level_folder", "maybe_another_one")
-}
-}
+\code{add()} makes sure scripts stored outside of the "R" folder are added to \code{.Rbuildignore}
+and turns these scripts into objects stored in \code{R/sysdata.rda}.
+\code{use_dir_package()} will place a call to \code{dir::add()} in your ".RProfile".
+You shouldn't need to call it manually.
 }

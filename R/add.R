@@ -1,53 +1,29 @@
-
 #' Add Folders to a R package
 #'
 #' @description
 #'
-#' `add()` allows you to store your code in a nested folder structure, rather than
-#' solely in the "R" folder. To do so:
+#' `add()` makes sure scripts stored outside of the "R" folder are added to `.Rbuildignore`
+#' and turns these scripts into objects stored in `R/sysdata.rda`.
+#' `use_dir_package()` will place a call to `dir::add()` in your ".RProfile".
+#' You shouldn't need to call it manually.
 #'
-#' * Have a call to `dir::add()` in your `.onLoad()` definition as shown
-#'  in the examples at the bottom of this page.
-#' * Call `devtools::load_all()` in your workflow, and never `devtools::document()`.
-#' Indeed `load_all()` will document everything through `dir::add()`, and
-#' `devtools::document()` would drop some ".Rd" files.
-#'
-#' Files and folders starting with "_" in your added folders will be ignored by the process.
-#'
-#' @section How does it work?:
-#'
-#' `dir::add()` will:
-#'
-#' * Add the 'dir' package to your "Suggests" dependencies in the "DESCRIPTION" file.
-#' * Add your added folders to ".Rbuidignore"
-#' * Load the code from your added folders into the `sysdata.rda` file in the R folder.
-#' * Load the objects into the session
-#' * Document everything, like `devtools::document()`
-#'
-#' @param ... Folders to add. You might provide strings, vectors or lists, they
-#'   will be flattened into a vector.
-#' @param .recursive Boolean. Whether to add folders under the added folders recursively.
+#' @inheritParams use_dir_package
 #'
 #' @export
-#' @examples
-#' \dontrun{
-#' .onLoad <- function(libname, pkgname) {
-#'   # the condition makes sure this is run only during development
-#'   if (Sys.getenv("DEVTOOLS_LOAD") == pkgname) dir::add("new_top_level_folder", "maybe_another_one")
-#' }
-#' }
-add <- function(..., .recursive = TRUE) {
+add <- function(..., recursive = TRUE, patch = FALSE) {
+  cli::cli_inform(c(i = "Loading external and nested folders"))
   # setup ======================================================================
-  usethis::use_package("dir", "Suggests")
-  withr::local_dir(here::here())
+  withr::local_dir(rprojroot::find_root(rprojroot::is_r_package))
   dirs <- sort(unlist(list(...)))
+  globals$dirs <- dirs
+  globals$recursive <- recursive
   dirs_exist <- sapply(dirs, dir.exists)
   if (!all(dirs_exist)) {
     msg <- "Additional dirs must exist"
     info <- sprintf("Not found: %s", toString(shQuote(dirs[!dirs_exist])))
     rlang::abort(c(msg, x = info))
   }
-  files <- unlist(lapply(dirs, list.files, recursive = .recursive, full.names = TRUE, pattern = "\\.[Rr]$"))
+  files <- unlist(lapply(dirs, list.files, recursive = recursive, full.names = TRUE, pattern = "\\.[Rr]$"))
   files <- grep("/_", files, invert = TRUE, value = TRUE)
 
   # update .Rbuildignore  ======================================================
@@ -86,21 +62,29 @@ add <- function(..., .recursive = TRUE) {
 
   # update the namespace with these values =====================================
   # sysdata.rda was already read when we call add() so we move them to the namespace manually
+  # this is safe, that's applied on the package under development
+  unlock_binding <- get("unlockBinding")
+  lock_binding <- get("lockBinding")
   rlang::env_unlock(ns)
   for (nm in intersect(names(objs), names(ns))) {
-      unlockBinding(nm, ns)
+    unlock_binding(nm, ns)
   }
   list2env(objs, ns)
   for (nm in names(objs)) {
-    lockBinding(nm, ns)
+    lock_binding(nm, ns)
   }
   rlang::env_lock(ns)
 
   # document ===================================================================
-  renamed_files <- file.path("R", gsub("/", "--", files))
-  file.rename(files, renamed_files)
-  on.exit(file.rename(renamed_files, files))
-  # load_code is set so the code is not reloaded after reoxygize()
-  roxygen2::roxygenize(".", load_code = function(x) ns)
-  pkgload::dev_topic_index_reset(".")
+  # renamed_files <- file.path("R", gsub("/", "--", files))
+  # file.rename(files, renamed_files)
+  # on.exit(file.rename(renamed_files, files))
+  # load_code is set so the code is not reloaded after reoxygenize()
+
+  # cli::cli_inform(c(i = "Updating documentation"))
+  # roxygen2::roxygenize(".", load_code = function(x) ns)
+  # if (patch) {
+  #   patch_workflow_funs(dirs)
+  # }
+  # pkgload::dev_topic_index_reset(".")
 }
