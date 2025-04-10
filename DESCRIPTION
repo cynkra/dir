@@ -1,5 +1,5 @@
 Package: dir
-Title: Use a nested folder structure in your package.
+Title: Use a nested folder structure in your package
 Version: 1.1.0.9000
 Authors@R: c(
     person("Antoine", "Fabri", , "antoine.fabri@gmail.com", role = c("aut", "cre")),
@@ -15,10 +15,16 @@ RoxygenNote: 7.3.2.9000
 Depends: 
     R (>= 3.5)
 Imports: 
-    here,
+    cli,
+    devtools,
+    fs,
+    lifecycle,
+    pkgbuild,
     pkgload,
     rlang,
     roxygen2,
+    rprojroot,
+    rstudioapi,
     usethis,
     withr
 URL: https://github.com/cynkra/dir
