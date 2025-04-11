@@ -75,18 +75,27 @@ use_test <- function(name = NULL, open = rlang::is_interactive(), test_structure
 
   # Handle flat test structure
   if (test_structure == "flat") {
-    temp_path_r <- sub("^R/", "", path)
-    temp_path_r <- fs::path("R", gsub("/", "--", temp_path_r))
-    base_name_r <- fs::path_file(temp_path_r)
-    with_interim_file(
-      temp_path_r,{
-        writeLines(readLines(path), temp_path_r)
-        usethis_use_test(base_name_r, open)
-      }
-    )
-    return(invisible(NULL))
+    use_test_flat(path, open)
+  } else {
+    use_test_nested(path, open)
   }
 
+
+}
+
+use_test_flat <- function(path, open) {
+  temp_path_r <- sub("^R/", "", path)
+  temp_path_r <- src_path_to_r_dashed(temp_path_r)
+  base_name_r <- fs::path_file(temp_path_r)
+  with_interim_file(
+    temp_path_r,{
+      writeLines(readLines(path), temp_path_r)
+      usethis_use_test(base_name_r, open)
+    }
+  )
+}
+
+use_test_nested <- function(path, open) {
   # handle nested test structure : test files
   base_name_r <- fs::path_file(path)
   base_name_tests <- paste0("test-", base_name_r)
@@ -112,6 +121,7 @@ use_test <- function(name = NULL, open = rlang::is_interactive(), test_structure
   update_test_runner_file()
   edit_file(dest_path, open)
 }
+
 
 update_test_runner_file <- function() {
   all_test_files <- setdiff(

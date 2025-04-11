@@ -11,6 +11,13 @@
 #'
 #' @export
 add <- function(..., recursive = TRUE, patch = FALSE) {
+  # cut short if called by tools pkg ===========================================
+  # covr triggers installations, which in turn trigger some reloads, but we don't
+  # want to rename our files when it happens
+  # this is not debuggable with browser() or messages when it happens
+  called_from_tools <- identical(topenv(sys.frame(1)), asNamespace("tools"))
+  if (called_from_tools) return(invisible(NULL))
+
   cli::cli_inform(c(i = "Loading external and nested folders"))
   # setup ======================================================================
   withr::local_dir(rprojroot::find_root(rprojroot::is_r_package))
@@ -25,6 +32,16 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   }
   files <- unlist(lapply(dirs, list.files, recursive = recursive, full.names = TRUE, pattern = "\\.[Rr]$"))
   files <- grep("/_", files, invert = TRUE, value = TRUE)
+
+  # happens when reloading automatically through document
+  # also to be safe and recover from bugs
+  directory_already_flattened <-
+    !length(files) && any(grepl("--", list.files("R", pattern = "[.][rR]$")))
+  if (directory_already_flattened) {
+    renamed_files <- grep("--", fs::dir_ls("R", regexp = "[.][rR]$"), value = TRUE)
+    files <- gsub("--", "/", fs::path_rel(renamed_files, "R"))
+    fs::file_move(renamed_files, files)
+  }
 
   # update .Rbuildignore  ======================================================
   # remove previous lines
@@ -75,6 +92,9 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   }
   rlang::env_lock(ns)
 
+  # patch workflow functions ===================================================
+  if (patch) patch_workflow_funs()
+
   # document ===================================================================
   # renamed_files <- file.path("R", gsub("/", "--", files))
   # file.rename(files, renamed_files)
@@ -83,8 +103,6 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
 
   # cli::cli_inform(c(i = "Updating documentation"))
   # roxygen2::roxygenize(".", load_code = function(x) ns)
-  # if (patch) {
-  #   patch_workflow_funs(dirs)
-  # }
+
   # pkgload::dev_topic_index_reset(".")
 }

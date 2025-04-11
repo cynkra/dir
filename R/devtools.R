@@ -13,12 +13,12 @@
 #' @export
 #' @name devtools
 document <- function(pkg = ".", roclets = NULL, quiet = FALSE) {
-  dirs <- globals$dirs
-  files <- unlist(lapply(dirs, list.files, recursive = globals$recursive, full.names = TRUE, pattern = "\\.[Rr]$"))
-  files <- grep("/_", files, invert = TRUE, value = TRUE)
-  renamed_files <- file.path("R", gsub("/", "--", files))
-  file.rename(files, renamed_files)
-  on.exit(file.rename(renamed_files, files))
+  files <- fetch_src_files(globals$dirs, globals$recursive)
+  renamed_files <- src_path_to_r_dashed(files)
+  fs::file_move(files, renamed_files)
+  # try silently because document() triggers a reload so this should be
+  # handled there already
+  on.exit(try(fs::file_move(renamed_files, files), silent = TRUE))
   devtools_document(pkg, roclets, quiet)
 }
 
@@ -84,5 +84,28 @@ build <- function(
     manual = manual,
     args = args,
     quiet = quiet,
+  )
+}
+
+#' @export
+#' @rdname devtools
+test_active_file <- function(file = find_active_file(), ...) {
+  if (rstudioapi::hasFun("documentSaveAll")) {
+    rstudioapi::documentSaveAll()
+  }
+
+  force(file)
+  if (!fs::path_dir(file) %in% c("R", "tests/testthat")) {
+    test_file <- src_path_to_test(file)
+    if (fs::file_exists(test_file)) {
+      file <- test_file
+      testthat::test_file(test_file, package = pkgload::pkg_name(), load_package = "source", ...)
+      return(invisible(NULL))
+    }
+  }
+
+  devtools_test_active_file(
+    file = file,
+    ...
   )
 }
