@@ -5,6 +5,7 @@
 \alias{document}
 \alias{check}
 \alias{build}
+\alias{test_active_file}
 \title{'devtools' overrides}
 \usage{
 document(pkg = ".", roclets = NULL, quiet = FALSE)
@@ -39,6 +40,8 @@ build(
   quiet = FALSE,
   ...
 )
+
+test_active_file(file = find_active_file(), ...)
 }
 \arguments{
 \item{pkg}{The package to use, can be a file path to the package or a

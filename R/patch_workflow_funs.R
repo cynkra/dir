@@ -1,4 +1,6 @@
 patch_workflow_funs <- function() {
+  cli::cli_inform(c(i = "Patching 'usethis', 'devtools' and 'covr' functions"))
+
   # To avoid notes, justified because:
   # * It's documented clearly
   # * The user needs to opt in
@@ -6,24 +8,36 @@ patch_workflow_funs <- function() {
   unlock_binding <- get("unlockBinding")
   lock_binding <- get("lockBinding")
   assign_in_namespace <- get("assignInNamespace")
-  cli::cli_inform(c(i = "Patching 'usethis' and 'devtools' functions"))
+
   usethis <- asNamespace("usethis")
-  devtools <- asNamespace("devtools")
   unlock_binding("use_test", usethis)
   unlock_binding("use_r", usethis)
+  assign_in_namespace("use_r", use_r_for_patch, usethis)
+  assign_in_namespace("use_test", use_test_for_patch, usethis)
+  lock_binding("use_test", usethis)
+  lock_binding("use_r", usethis)
+
+  devtools <- asNamespace("devtools")
   unlock_binding("document", devtools)
   unlock_binding("check", devtools)
   unlock_binding("build", devtools)
-  assign_in_namespace("use_r", use_r_for_patch, usethis)
-  assign_in_namespace("use_test", use_test_for_patch, usethis)
+  unlock_binding("test_active_file", devtools)
   assign_in_namespace("document", document_for_patch, devtools)
   assign_in_namespace("check", check_for_patch, devtools)
   assign_in_namespace("build", build_for_patch, devtools)
-  lock_binding("use_test", usethis)
-  lock_binding("use_r", usethis)
+  assign_in_namespace("test_active_file", test_active_file_for_patch, devtools)
   lock_binding("document", devtools)
   lock_binding("check", devtools)
   lock_binding("build", devtools)
+  lock_binding("test_active_file", devtools)
+
+  covr <- asNamespace("covr")
+  unlock_binding("report", covr)
+  unlock_binding("package_coverage", covr)
+  assign_in_namespace("report", report_for_patch, covr)
+  assign_in_namespace("package_coverage", package_coverage_for_patch, covr)
+  lock_binding("report", covr)
+  lock_binding("package_coverage", covr)
 }
 
 use_r_for_patch <- function(name = NULL, open = rlang::is_interactive()) {
@@ -99,5 +113,47 @@ build_for_patch <- function(
     manual = manual,
     args = args,
     quiet = quiet,
+  )
+}
+
+report_for_patch <- function(
+    x = dir::package_coverage(),
+    file = file.path(tempdir(), paste0(attr(x, "package")$package %||% "coverage", "-report.html")),
+    browse = interactive()) {
+  cli::cli_inform(cli::col_grey("patched to `dir::report()`"))
+  dir::report(x, file, browse)
+}
+
+package_coverage_for_patch <- function(path = ".", type = c("tests", "vignettes", "examples",
+                                                            "all", "none"), combine_types = TRUE, relative_path = TRUE,
+                                       quiet = TRUE, clean = TRUE, line_exclusions = NULL, function_exclusions = NULL,
+                                       code = character(), install_path = normalizePath(tempfile("R_LIBS"), mustWork = FALSE), ...,
+                                       exclusions, pre_clean = TRUE) {
+  cli::cli_inform(cli::col_grey("patched to `dir::package_coverage()`"))
+  if (missing(type)) {
+    type <- "tests"
+  }
+  dir::package_coverage(
+    path = path,
+    type = type,
+    combine_types = combine_types,
+    relative_path = relative_path,
+    quiet = quiet,
+    clean = clean,
+    line_exclusions = line_exclusions,
+    function_exclusions = function_exclusions,
+    code = code,
+    install_path = install_path,
+    ...,
+    exclusions = exclusions,
+    pre_clean = pre_clean
+  )
+}
+
+test_active_file_for_patch <- function(file = find_active_file(), ...) {
+  cli::cli_inform(cli::col_grey("patched to `dir::test_active_file()`"))
+  dir::test_active_file(
+    file = file,
+    ...
   )
 }
