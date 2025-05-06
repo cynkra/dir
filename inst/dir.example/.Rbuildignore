@@ -1,0 +1,5 @@
+# dir::add() start
+^greetings$
+^math$
+^R/r_subfolder$
+# dir::add() end
