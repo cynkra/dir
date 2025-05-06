@@ -1,3 +1,6 @@
+^LICENSE\.md$
+^.RProfile$
+^README\.Rmd$
 # dir::add() start
 ^greetings$
 ^math$

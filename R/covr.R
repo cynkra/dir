@@ -5,6 +5,7 @@
 #' which will patch the actual 'covr' functions directly.
 #'
 #' @inheritParams covr::report
+#' @inheritParams covr::package_coverage
 #'
 #' @return These functions return `NULL` invisibly, they're called for side effects.
 #' @seealso [devtools::document()], [devtools::check()], [devtools::build()]

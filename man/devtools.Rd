@@ -113,6 +113,10 @@ the user, both \code{check()} and \code{check_built()} default to \code{error_on
 
 \item{binary}{Produce a binary (\code{--binary}) or source (
 \code{--no-manual --no-resave-data}) version of the package.}
+
+\item{file}{One or more source or test files. If a source file the
+corresponding test file will be run. The default is to use the active file
+in RStudio (if available).}
 }
 \value{
 These functions return \code{NULL} invisibly, they're called for side effects.

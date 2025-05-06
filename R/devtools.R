@@ -7,6 +7,7 @@
 #' @inheritParams devtools::document
 #' @inheritParams devtools::check
 #' @inheritParams devtools::build
+#' @inheritParams devtools::test_active_file
 #'
 #' @return These functions return `NULL` invisibly, they're called for side effects.
 #' @seealso [devtools::document()], [devtools::check()], [devtools::build()]
