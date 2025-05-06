@@ -22,7 +22,7 @@ use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides 
   hook <- bquote(
     setHook(packageEvent(.(pkg), "onLoad"), function(...) .(substitute(dir::add(...))), "replace")
   )
-  args <- list(recursive = recursive, document, patch = patch, add_overrides = add_overrides)
+  args <- list(recursive = recursive, patch = patch, add_overrides = add_overrides)
   if (recursive) args$recursive <- NULL
   if (!patch) args$patch <- NULL
   if (add_overrides == !patch) args$add_overrides <- NULL
