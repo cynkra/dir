@@ -82,7 +82,6 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   # this is safe, that's applied on the package under development
   unlock_binding <- get("unlockBinding")
   lock_binding <- get("lockBinding")
-  rlang::env_unlock(ns)
   for (nm in intersect(names(objs), names(ns))) {
     unlock_binding(nm, ns)
   }
@@ -90,7 +89,6 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   for (nm in names(objs)) {
     lock_binding(nm, ns)
   }
-  rlang::env_lock(ns)
 
   # patch workflow functions ===================================================
   if (patch) patch_workflow_funs()
