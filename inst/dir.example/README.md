@@ -1,0 +1,37 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# dir.example
+
+‘dir.example’ shows how the [‘dir’](https://github.com/cynkra/dir)
+package works.
+
+Look at the code and you’ll see we have some code in the R folder but
+also in 2 other folders named “greetings” and “math”, where we have
+another nested folder.
+
+To set up this project to use dir we used the following command:
+
+``` r
+dir::use_dir_package("greetings", "math", "inst/not_build_ignored", "R/r_subfolder", patch = TRUE)
+```
+
+We see that :
+
+- The R files are properly sourced from everywhere
+- The doc is properly knitted
+- The file “math/*sandbox.R” is ignored due to the ”*” prefix (files
+  starting with “.” are ignored too)
+- The script “inst/not_build_ignored/answer.R” is not build ignored
+  since (we don’t build ignore code stored under “inst”)
+- `devtools::check()` passes
+- `devtools::test()` passes
+- The package doesn’t depend on {dir} (not even suggested)
+
+## Installation
+
+Install with:
+
+``` r
+pak::pak("cynkra/dir/inst/dir.example")
+```
