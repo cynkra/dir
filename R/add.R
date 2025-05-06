@@ -11,6 +11,14 @@
 #'
 #' @export
 add <- function(..., recursive = TRUE, patch = FALSE) {
+
+  if (globals$skip) {
+    # patch workflow functions ===================================================
+    if (patch) patch_workflow_funs()
+    globals$skip <- FALSE
+    return(invisible(NULL))
+  }
+
   # cut short if called by tools pkg ===========================================
   # covr triggers installations, which in turn trigger some reloads, but we don't
   # want to rename our files when it happens
@@ -61,21 +69,25 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   })
   save(list = names(e), file = "R/sysdata.rda", envir = as.environment(objs), compress = "bzip2", version = 3, ascii = FALSE)
 
-  # update the namespace with these values =====================================
-  # sysdata.rda was already read when we call add() so we move them to the namespace manually
-  # this is safe, that's applied on the package under development
-  unlock_binding <- get("unlockBinding")
-  lock_binding <- get("lockBinding")
-  for (nm in intersect(names(objs), names(ns))) {
-    unlock_binding(nm, ns)
-  }
-  list2env(objs, ns)
-  for (nm in names(objs)) {
-    lock_binding(nm, ns)
-  }
+  # # update the namespace with these values =====================================
+  # # sysdata.rda was already read when we call add() so we move them to the namespace manually
+  # # this is safe, that's applied on the package under development
+  # unlock_binding <- get("unlockBinding")
+  # lock_binding <- get("lockBinding")
+  # for (nm in intersect(names(objs), names(ns))) {
+  #   unlock_binding(nm, ns)
+  # }
+  # list2env(objs, ns)
+  # for (nm in names(objs)) {
+  #   lock_binding(nm, ns)
+  # }
+
+  globals$skip <- TRUE
+
+  devtools::load_all(".", quiet = TRUE)
 
   # patch workflow functions ===================================================
-  if (patch) patch_workflow_funs()
+  # if (patch) patch_workflow_funs()
 
   # document ===================================================================
   # renamed_files <- file.path("R", gsub("/", "--", files))
