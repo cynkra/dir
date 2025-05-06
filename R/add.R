@@ -33,15 +33,16 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   files <- unlist(lapply(dirs, list.files, recursive = recursive, full.names = TRUE, pattern = "\\.[Rr]$"))
   files <- grep("/_", files, invert = TRUE, value = TRUE)
 
-  # happens when reloading automatically through document
-  # also to be safe and recover from bugs
-  directory_already_flattened <-
-    !length(files) && any(grepl("--", list.files("R", pattern = "[.][rR]$")))
-  if (directory_already_flattened) {
-    renamed_files <- grep("--", fs::dir_ls("R", regexp = "[.][rR]$"), value = TRUE)
-    files <- gsub("--", "/", fs::path_rel(renamed_files, "R"))
-    fs::file_move(renamed_files, files)
-  }
+  ### below commented because it makes roxygenize remove files before they're parsed
+  # # happens when reloading automatically through document
+  # # also to be safe and recover from bugs
+  # directory_already_flattened <-
+  #   !length(files) && any(grepl("--", list.files("R", pattern = "[.][rR]$")))
+  # if (directory_already_flattened) {
+  #   renamed_files <- grep("--", fs::dir_ls("R", regexp = "[.][rR]$"), value = TRUE)
+  #   files <- gsub("--", "/", fs::path_rel(renamed_files, "R"))
+  #   fs::file_move(renamed_files, files)
+  # }
 
   # update .Rbuildignore  ======================================================
   # remove previous lines
