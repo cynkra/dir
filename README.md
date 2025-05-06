@@ -6,7 +6,7 @@
 {dir} allows you to store your code in a nested folder structure, rather
 than solely in the “R” folder, without any code duplication.
 
-Set it up your project with one command and work as usual, just with as
+Set up your project with one command and work as usual, just with as
 many folders as you like.
 
 {dir} won’t be needed by the end users of your package, you don’t even
@@ -34,11 +34,11 @@ dir::use_dir_package("any_folder_in_your_repo", "maybe_another", patch = TRUE)
 This will set your project’s .RProfile so the multi folder thing just
 works.
 
-Note that `patch = TRUE` means we modify some functions from ‘usethis’
-and ‘devtools’. They still work as they did but now support flexible
-folder structures. The default `patch = FALSE` is less invasive, it
-doesn’t touch those but places shims in a `"dir-overrides"` environment
-on the search path.
+Note that `patch = TRUE` means we modify in the scope of this project
+some functions from ‘usethis’ and ‘devtools’. They still work as they
+did but now support flexible folder structures. The default
+`patch = FALSE` is less invasive, it doesn’t touch those but places
+shims in a `"dir-overrides"` environment on the search path.
 
 For a better experience if you use RStudio we advise that you remap
 Ctrl+Shift+D to call `devtools::document()` outside of the build pane,
@@ -92,16 +92,18 @@ inside, and that makes it CRAN compliant.
 
 ## Do you have an example ?
 
-Sure, [there you go!](https://github.com/cynkra/dir.example)
+Sure, here’s a minimal example where you can inspect the file structure,
+NAMESPACE, .RProfile, .Rbuildignore etc :
+<https://github.com/cynkra/dir/tree/main/inst/dir.example>
 
 ## History
 
-This has been raise on
+This has been raised on
 [r-devel](https://stat.ethz.ch/pipermail/r-devel/2009-December/056022.html)
 [multiple](https://stat.ethz.ch/pipermail/r-devel/2010-February/056513.html)
 [times](https://hypatia.math.ethz.ch/pipermail/r-devel/2023-March/082496.html)
-multiple times but little interest has been shown to implement the
-feature, so here we are.
+but little interest has been shown to implement the feature, so here we
+are.
 
 ## Other efforts
 
