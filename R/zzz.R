@@ -27,3 +27,4 @@ covr_package_coverage <- NULL
   covr_package_coverage <<- covr::package_coverage
 }
 
+globalVariables(c("find_active_file"))

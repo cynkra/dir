@@ -2,3 +2,7 @@
 ^\.Rproj\.user$
 ^dir.example$
 ^LICENSE\.md$
+^README\.Rmd$
+^\.Rbuildignore$
+^inst/dir\.example/\.RProfile$
+^inst/dir\.example/\.Rbuildignore$

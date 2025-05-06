@@ -16,6 +16,7 @@ Depends:
     R (>= 3.5)
 Imports: 
     cli,
+    covr,
     devtools,
     fs,
     lifecycle,
@@ -25,7 +26,11 @@ Imports:
     roxygen2,
     rprojroot,
     rstudioapi,
+    testthat,
     usethis,
     withr
+Suggests:
+    htmltools,
+    DT
 URL: https://github.com/cynkra/dir
 BugReports: https://github.com/cynkra/dir/issues
