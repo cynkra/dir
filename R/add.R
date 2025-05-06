@@ -44,24 +44,7 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   }
 
   # update .Rbuildignore  ======================================================
-  # remove previous lines
-  build_ignore <-
-    if (file.exists(".Rbuildignore")) readLines(".Rbuildignore") else character()
-
-  start_remove <- which(build_ignore == c("# dir::add() start"))
-  end_remove <- which(build_ignore == c("# dir::add() end"))
-  if (length(start_remove)) {
-    build_ignore <- build_ignore[-(start_remove:end_remove)]
-  }
-  # add new lines
-  build_ignore <- c(
-    build_ignore,
-    "# dir::add() start",
-    paste0("^", dirs, "$"),
-    "# dir::add() end"
-  )
-  # save
-  writeLines(build_ignore, ".Rbuildignore")
+  update_build_ignore(dirs)
 
   # update sysdata.rda =========================================================
   e <- new.env()
