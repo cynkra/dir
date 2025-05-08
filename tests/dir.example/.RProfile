@@ -1,9 +1,0 @@
-source("~/.Rprofile") # source user level R profile
-
-
-### start of {dir} setup ###
-# See `?dir::use_dir_package`
-options(dir.test_structure = "nested") # "nested" or "flat", see `?dir::use_r()`
-setHook(packageEvent("dir.example", "onLoad"), function(...) dir::add("greetings", "math", "inst/not_build_ignored", "R/r_subfolder", patch = TRUE), "replace")
-### end of {dir} setup ###
-
