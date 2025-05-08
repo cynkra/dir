@@ -16,7 +16,6 @@
 #' @return Returns `NULL` invisibly, called for side effects.
 #' @export
 use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides = !patch) {
-  withr::local_dir(rprojroot::find_root(rprojroot::is_r_package))
   pkg <- pkgload::pkg_name()
 
   hook <- bquote(

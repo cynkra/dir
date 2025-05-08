@@ -28,7 +28,6 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
 
   cli::cli_inform(c(i = "Loading external and nested folders"))
   # setup ======================================================================
-  withr::local_dir(rprojroot::find_root(rprojroot::is_r_package))
   dirs <- sort(unlist(list(...)))
   globals$dirs <- dirs
   globals$recursive <- recursive
