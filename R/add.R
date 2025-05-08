@@ -2,8 +2,9 @@
 #'
 #' @description
 #'
-#' `add()` makes sure scripts stored outside of the "R" folder are added to `.Rbuildignore`
-#' and turns these scripts into objects stored in `R/sysdata.rda`.
+#' `add()` adds to `.Rbuildignore` scripts that aren't under "inst" or directly under "R",
+#'  and then turns into objects stored in `R/sysdata.rda` the scripts that are
+#'  under R subfolders or manually added.
 #' `use_dir_package()` will place a call to `dir::add()` in your ".RProfile".
 #' You shouldn't need to call it manually.
 #'
@@ -32,7 +33,9 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
 
   cli::cli_inform(c(i = "Loading external and nested folders"))
   # setup ======================================================================
-  dirs <- sort(unlist(list(...)))
+  r_subfolders <- fs::dir_ls("R", type = "directory")
+  provided_folders <- unlist(list(...))
+  dirs <- sort(unique(fs::path_norm(c(r_subfolders, provided_folders))))
   globals$dirs <- dirs
   globals$recursive <- recursive
   dirs_exist <- sapply(dirs, dir.exists)

@@ -24,7 +24,7 @@ test_that("document and load all untouched package", {
 
 test_that("use_dir_package gives us the new objects, undocumented at this point", {
   expect_snapshot({
-    use_dir_package("greetings", "math", "inst/not_build_ignored", "R/r_subfolder", patch = TRUE)
+    use_dir_package("greetings", "math", "inst/not_build_ignored", patch = TRUE)
     ls(asNamespace("dir.example"))
     getNamespaceExports("dir.example")
     list.files("man")
