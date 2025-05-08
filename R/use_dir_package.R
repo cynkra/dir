@@ -16,9 +16,13 @@
 #' @return Returns `NULL` invisibly, called for side effects.
 #' @export
 use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides = !patch) {
-  withr::local_dir(rprojroot::find_root(rprojroot::is_r_package))
-  pkg <- pkgload::pkg_name()
+  # build hook code ============================================================
+  if (!...length()) {
+    rlang::abort("Please provide at least one folder")
+  }
 
+  # build hook code ============================================================
+  pkg <- pkgload::pkg_name()
   hook <- bquote(
     setHook(packageEvent(.(pkg), "onLoad"), function(...) .(substitute(dir::add(...))), "replace")
   )
@@ -48,6 +52,8 @@ use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides 
     '### end of {dir} setup ###'
   )
 
+  # Edit .RProfile =============================================================
+
   cli::cli_inform(c(i = "Editing {.path .RProfile}"))
   if (!file.exists(".Rprofile")) {
     rprofile <- c('source("~/.Rprofile") # source user level R profile\n\n', code, "")
@@ -63,8 +69,56 @@ use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides 
     rprofile <- c(rprofile, "", code, "")
   }
   writeLines(rprofile, ".RProfile")
-  suppressMessages(usethis::edit_r_profile("project"))
+  if (interactive()) suppressMessages(usethis::edit_r_profile("project"))
+
+  # Setup hook a first time ====================================================
   eval.parent(parse(text = code))
+
+  # Load =======================================================================
   pkgload::load_all()
+
+  # Edit .onLoad ===============================================================
+  .onLoad <- asNamespace(pkg)$.onLoad
+  if (!is.null(.onLoad)) {
+    srcref <- attr(.onLoad, "srcref")
+    on_load_code <- capture.output(.onLoad)
+    on_load_code <- on_load_code[-length(on_load_code)] # remove namespace line
+    on_load_file <- trimws(capture.output(attr(srcref, "srcfile")))
+    lines <- readLines(on_load_file)
+    start_pos <- which(startsWith(lines, ".onLoad"))
+    lines <- lines[-((start_pos - 1) + 1:length(on_load_code))]
+    on_load_code[[1]] <- ".onLoad <- function(libname, pkgname) {"
+    on_load_code <- on_load_code[cumsum(startsWith(on_load_code, "# {dir}")) != 1]
+    on_load_code <- on_load_code[-length(on_load_code)] # remove closing "}"
+    on_load_code <- c(
+      on_load_code,
+      "  # {dir} start",
+      "  ns <- asNamespace(pkgname)",
+      "  for (nm in names(ns)) {",
+      "    f <- ns[[nm]]",
+      "    if (is.function(f)) environment(f) <- ns",
+      "    ns[[nm]] <- f",
+      "  }",
+      "  # {dir} end",
+      "}"
+    )
+    lines <- append(lines, on_load_code, after = start_pos - 1)
+    writeLines(lines, on_load_file)
+  } else {
+    on_load_code <- c(
+      ".onLoad <- function(libname, pkgname) {",
+      "  # {dir} start",
+      "  ns <- asNamespace(pkgname)",
+      "  for (nm in names(ns)) {",
+      "    f <- ns[[nm]]",
+      "    if (is.function(f)) environment(f) <- ns",
+      "    ns[[nm]] <- f",
+      "  }",
+      "  # {dir} end",
+      "}"
+    )
+    writeLines(on_load_code, "R/zzz.R")
+  }
+
   cli::cli_inform(c(">" = "You're good to go!"))
 }

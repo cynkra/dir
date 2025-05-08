@@ -17,9 +17,13 @@ document <- function(pkg = ".", roclets = NULL, quiet = FALSE) {
   files <- fetch_src_files(globals$dirs, globals$recursive)
   renamed_files <- src_path_to_r_dashed(files)
   fs::file_move(files, renamed_files)
+  globals$flat_state <- TRUE
   # try silently because document() triggers a reload so this should be
   # handled there already
-  on.exit(try(fs::file_move(renamed_files, files), silent = TRUE))
+  on.exit({
+    try(fs::file_move(renamed_files, files), silent = TRUE)
+    globals$flat_state <- FALSE
+  })
   devtools_document(pkg, roclets, quiet)
 }
 

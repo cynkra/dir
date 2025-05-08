@@ -1,9 +1,8 @@
 ^LICENSE\.md$
 ^.RProfile$
 ^README\.Rmd$
-^dir\.example\.Rproj$
 # dir::add() start
+^R/r_subfolder$
 ^greetings$
 ^math$
-^R/r_subfolder$
 # dir::add() end

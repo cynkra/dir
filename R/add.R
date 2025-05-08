@@ -11,6 +11,10 @@
 #'
 #' @export
 add <- function(..., recursive = TRUE, patch = FALSE) {
+  # sometimes we need to move scripts temporarily to R to call an external
+  # function and this function triggers a reload, in those cases we need
+  # to return early or this will corrupt sysdata.rda (examples: devtools::build)
+  if (globals$flat_state) return(invisible(NULL))
 
   if (globals$skip) {
     # patch workflow functions ===================================================
@@ -28,7 +32,6 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
 
   cli::cli_inform(c(i = "Loading external and nested folders"))
   # setup ======================================================================
-  withr::local_dir(rprojroot::find_root(rprojroot::is_r_package))
   dirs <- sort(unlist(list(...)))
   globals$dirs <- dirs
   globals$recursive <- recursive
@@ -58,12 +61,11 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   # update sysdata.rda =========================================================
   e <- new.env()
   for (file in files) source(file, local = e)
-  ns <- asNamespace(pkgload::pkg_name())
 
   # set environment of functions and env formulas to ns
   objs <- eapply(e, function(x) {
     if (is.function(x) || rlang::is_formula("formula")) {
-      environment(x) <- ns
+      environment(x) <- .GlobalEnv
     }
     x
   })
