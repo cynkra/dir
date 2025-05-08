@@ -11,6 +11,10 @@
 #'
 #' @export
 add <- function(..., recursive = TRUE, patch = FALSE) {
+  # sometimes we need to move scripts temporarily to R to call an external
+  # function and this function triggers a reload, in those cases we need
+  # to return early or this will corrupt sysdata.rda (examples: devtools::build)
+  if (globals$flat_state) return(invisible(NULL))
 
   if (globals$skip) {
     # patch workflow functions ===================================================

@@ -21,10 +21,14 @@ report <- function(
   files <- grep("/_", files, invert = TRUE, value = TRUE)
   renamed_files <- file.path("R", gsub("/", "--", files))
   fs::file_move(files, renamed_files)
+  globals$flat_state <- TRUE
   force(x)
   # try silently because document() triggers a reload so this should be
   # handled there already
-  on.exit(try(fs::file_move(renamed_files, files), silent = TRUE))
+  on.exit({
+    try(fs::file_move(renamed_files, files), silent = TRUE)
+    globals$flat_state <- FALSE
+  })
   covr_report(x, file, browse)
 }
 
@@ -44,10 +48,13 @@ package_coverage <- function(path = ".", type = c("tests", "vignettes", "example
   files <- grep("/_", files, invert = TRUE, value = TRUE)
   renamed_files <- file.path("R", gsub("/", "--", files))
   fs::file_move(files, renamed_files)
-
+  globals$flat_state <- TRUE
   # try silently because document() triggers a reload so this should be
   # handled there already
-  on.exit({try(fs::file_move(renamed_files, files), silent = TRUE)})
+  on.exit({
+    try(fs::file_move(renamed_files, files), silent = TRUE)
+    globals$flat_state <- FALSE
+  })
 
   # note: package_coverage takes paths from src_ref so we don't have any
   # replacement to do on the output

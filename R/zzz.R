@@ -2,6 +2,7 @@ globals <- new.env()
 globals$dirs <- NULL
 globals$recursive <- NULL
 globals$skip <- FALSE
+globals$flat_state <- FALSE
 
 usethis_use_test <- NULL
 usethis_use_r <- NULL
