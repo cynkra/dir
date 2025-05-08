@@ -1,6 +1,7 @@
 ^LICENSE\.md$
 ^.RProfile$
 ^README\.Rmd$
+^dir\.example\.Rproj$
 # dir::add() start
 ^greetings$
 ^math$
