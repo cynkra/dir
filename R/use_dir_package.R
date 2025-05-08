@@ -17,11 +17,6 @@
 #' @export
 use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides = !patch) {
   # build hook code ============================================================
-  if (!...length()) {
-    rlang::abort("Please provide at least one folder")
-  }
-
-  # build hook code ============================================================
   pkg <- pkgload::pkg_name()
   hook <- bquote(
     setHook(packageEvent(.(pkg), "onLoad"), function(...) .(substitute(dir::add(...))), "replace")
