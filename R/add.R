@@ -61,12 +61,11 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   # update sysdata.rda =========================================================
   e <- new.env()
   for (file in files) source(file, local = e)
-  ns <- asNamespace(pkgload::pkg_name())
 
   # set environment of functions and env formulas to ns
   objs <- eapply(e, function(x) {
     if (is.function(x) || rlang::is_formula("formula")) {
-      environment(x) <- ns
+      environment(x) <- .GlobalEnv
     }
     x
   })
