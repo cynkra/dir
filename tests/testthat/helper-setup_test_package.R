@@ -15,7 +15,7 @@ setup_test_package <- function() {
     "NAMESPACE",
     ".RProfile",
     "R/sysdata.rda",
-    "tests/testthat/helper-nested-files.R"
+    "tests/testthat/test-nested-test-scripts.R"
   )))
   # created by {dir}
   fs::dir_delete(fs::path(dest, "man"))

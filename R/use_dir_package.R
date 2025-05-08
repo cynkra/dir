@@ -120,5 +120,14 @@ use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides 
     writeLines(on_load_code, "R/zzz.R")
   }
 
+  use_dir_tests()
+
   cli::cli_inform(c(">" = "You're good to go!"))
+}
+
+
+use_dir_tests <- function() {
+  suppressMessages(usethis::use_testthat())
+  file <- system.file("dir.example/tests/testthat/test-nested-test-scripts.R", package = "dir")
+  fs::file_copy(file, "tests/testthat/test-nested-test-scripts.R")
 }
