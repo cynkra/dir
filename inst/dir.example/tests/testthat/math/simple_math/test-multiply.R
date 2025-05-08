@@ -1,3 +1,3 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
+test_that("dir.example::multiply() works", {
+  expect_equal(multiply(2, 3), 6)
 })
