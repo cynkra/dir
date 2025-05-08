@@ -139,7 +139,7 @@ update_test_runner_file <- function() {
     sprintf('source_with_context("%s")', all_test_files)
   )
 
-  writeLines(code, "tests/testthat/test--nested-files.R")
+  writeLines(code, "tests/testthat/helper-nested-files.R")
 }
 
 # modified from usethis
