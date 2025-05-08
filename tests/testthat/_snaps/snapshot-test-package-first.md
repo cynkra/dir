@@ -213,9 +213,12 @@
       
       ### tests/testthat/math/simple_math/test-multiply.R ----
       
-      test_that("multiplication works", {
-        expect_equal(2 * 2, 4)
+      test_that("dir.example::multiply() works", {
+        expect_equal(multiply(2, 3), 6)
       })
+      
+      ### tests/testthat/test-dummy.R ----
+      
       
       ### tests/testthat.R ----
       
@@ -301,6 +304,41 @@
       list.files("man")
     Output
       [1] "hello.Rd"    "multiply.Rd" "reverse.Rd"  "shout.Rd"   
+
+# patched devtools::test() works
+
+    Code
+      devtools::test()
+    Message
+      i Testing dir.example
+      i Loading external and nested folders
+      i Patching 'usethis', 'devtools' and 'covr' functions
+    Output
+      v | F W  S  OK | Context
+      
+      / |          0 | dummy                                                          
+      == Results =====================================================================
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 0 ]
+
+# patched covr::package_coverage() works
+
+    Code
+      fs::dir_ls("R")
+    Output
+      R/r_subfolder R/sysdata.rda R/utils.R     R/zzz.R       
+    Code
+      names(asNamespace("dir.example"))
+    Output
+       [1] ".onLoad"              ".__DEVTOOLS__"        ".packageName"        
+       [4] "reverse"              "shout"                "answer"              
+       [7] ".__NAMESPACE__."      "hello"                ".__S3MethodsTable__."
+      [10] "multiply"            
+    Code
+      e <- new.env()
+      load("R/sysdata.rda", e)
+      names(e)
+    Output
+      [1] "reverse"  "answer"   "hello"    "multiply"
 
 # patched devtools::build() works
 
