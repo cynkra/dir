@@ -88,7 +88,12 @@ use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides 
     start_pos <- which(startsWith(lines, ".onLoad"))
     lines <- lines[-((start_pos - 1) + 1:length(on_load_code))]
     on_load_code[[1]] <- ".onLoad <- function(libname, pkgname) {"
-    on_load_code <- on_load_code[cumsum(startsWith(on_load_code, "# {dir}")) != 1]
+    start <- which(on_load_code == "  # {dir} start")
+    end <- which(on_load_code == "  # {dir} end")
+    if (length(start)) {
+      on_load_code <- on_load_code[-(start:end)]
+    }
+    on_load_code <- on_load_code[cumsum(startsWith(on_load_code, "  # {dir}")) != 1]
     on_load_code <- on_load_code[-length(on_load_code)] # remove closing "}"
     on_load_code <- c(
       on_load_code,
@@ -128,6 +133,6 @@ use_dir_package <- function(..., recursive = TRUE, patch = FALSE, add_overrides 
 
 use_dir_tests <- function() {
   suppressMessages(usethis::use_testthat())
-  file <- system.file("dir.example/tests/testthat/test-nested-test-scripts.R", package = "dir")
-  fs::file_copy(file, "tests/testthat/test-nested-test-scripts.R")
+  file <- system.file("test-nested-test-scripts.R", package = "dir")
+  fs::file_copy(file, "tests/testthat/test-nested-test-scripts.R", overwrite = TRUE)
 }
