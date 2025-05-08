@@ -6,6 +6,9 @@
 {dir} allows you to store your code in a nested folder structure, rather
 than solely in the “R” folder, without any code duplication.
 
+It’s useful if you have a lot of scripts or if you want to turn a non
+package project into a package.
+
 Set up your project with one command and work as usual, just with as
 many folders as you like.
 
@@ -28,6 +31,10 @@ pak::pak("cynkra/dir")
 To set up your package to use it with ‘dir’ we recommend the following :
 
 ``` r
+# allow nested folders under R/ and patch useful workflow functions
+dir::use_dir_package(patch = TRUE)
+
+# use additional folders
 dir::use_dir_package("any_folder_in_your_repo", "maybe_another", patch = TRUE)
 ```
 
@@ -38,7 +45,8 @@ Note that `patch = TRUE` means we modify in the scope of this project
 some functions from ‘usethis’ and ‘devtools’. They still work as they
 did but now support flexible folder structures. The default
 `patch = FALSE` is less invasive, it doesn’t touch those but places
-shims in a `"dir-overrides"` environment on the search path.
+shims in a `"dir-overrides"` environment on the search path (but these
+won’t be triggered by your existent key bindings).
 
 For a better experience if you use RStudio we advise that you remap
 Ctrl+Shift+D to call `devtools::document()` outside of the build pane,
@@ -46,7 +54,7 @@ because we can’t patch the build pane and the output of
 `devtools::document()` is usually terse enough anyway.
 
 For this go to `Tools` / `Modify Keyboard Shortcuts` and use the
-“Document a package” addin.
+“Document a package” addin rather than “Build Package Documentation”.
 
 ![](inst/rstudio-screenshot.png)
 
