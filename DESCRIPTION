@@ -34,3 +34,4 @@ Suggests:
     DT
 URL: https://github.com/cynkra/dir
 BugReports: https://github.com/cynkra/dir/issues
+Config/testthat/edition: 3
