@@ -45,9 +45,8 @@ test_that("patched devtools::test() works", {
   })
 })
 
-
 test_that("patched covr::package_coverage() works", {
-  # fs::dir_copy(".", fs::path(old_wd, "../dir.example"), overwrite = TRUE)
+  # fs::dir_copy(".", fs::path(old_wd, "../../../dir.example"), overwrite = TRUE)
   # this seems to work locally but here we can't get an output,
   # we still check if the R folder is in the right state
 
@@ -64,7 +63,7 @@ test_that("patched covr::package_coverage() works", {
 })
 
 test_that("patched devtools::build() works", {
-  #fs::dir_copy(".", fs::path(old_wd, "../dir.example"), overwrite = TRUE)
+  # fs::dir_copy(".", fs::path(old_wd, "../../../dir.example"), overwrite = TRUE)
   expect_snapshot({
     # we have to make it quiet because it shows absolute paths
     # we could also edit the output or check with regex
@@ -79,7 +78,7 @@ test_that("patched devtools::build() works", {
 })
 
 test_that("patched devtools::check() works", {
-  # fs::dir_copy(".", fs::path(old_wd, "../dir.example"), overwrite = TRUE)
+  # fs::dir_copy(".", fs::path(old_wd, "../../../dir.example"), overwrite = TRUE)
   expect_snapshot({
     # we have to make it quiet because it shows absolute paths
     # we could also edit the output or check with regex
