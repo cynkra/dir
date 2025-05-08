@@ -16,8 +16,9 @@ work with 'dir'. Recommended but since it is invasive it defaults to \code{FALSE
 Forwarded to \code{dir::add()}}
 }
 \description{
-\code{add()} makes sure scripts stored outside of the "R" folder are added to \code{.Rbuildignore}
-and turns these scripts into objects stored in \code{R/sysdata.rda}.
+\code{add()} adds to \code{.Rbuildignore} scripts that aren't under "inst" or directly under "R",
+and then turns into objects stored in \code{R/sysdata.rda} the scripts that are
+under R subfolders or manually added.
 \code{use_dir_package()} will place a call to \code{dir::add()} in your ".RProfile".
 You shouldn't need to call it manually.
 }
