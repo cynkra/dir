@@ -217,9 +217,6 @@
         expect_equal(multiply(2, 3), 6)
       })
       
-      ### tests/testthat/test-dummy.R ----
-      
-      
       ### tests/testthat.R ----
       
       # This file is part of the standard setup for testthat.
@@ -316,9 +313,12 @@
     Output
       v | F W  S  OK | Context
       
-      / |          0 | dummy                                                          
+      / |          0 | nested-test-scripts                                            
+      / |          0 | math/simple_math/multiply                                      
+      v |          1 | math/simple_math/multiply
+      
       == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 0 ]
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
 
 # patched covr::package_coverage() works
 
