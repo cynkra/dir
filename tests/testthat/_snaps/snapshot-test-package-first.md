@@ -90,6 +90,19 @@
         message(toupper(x))
       }
       
+      ### R/zzz.R ----
+      
+      .onLoad <- function(libname, pkgname) {
+        # {dir} start
+        ns <- asNamespace(pkgname)
+        for (nm in names(ns)) {
+          f <- ns[[nm]]
+          if (is.function(f)) environment(f) <- ns
+          ns[[nm]] <- f
+        }
+        # {dir} end
+      }
+      
       ### README.Rmd ----
       
       ---
@@ -213,13 +226,7 @@
       
       ### tests/testthat/math/simple_math/test-multiply.R ----
       
-      test_that("multiplication works", {
-        expect_equal(2 * 2, 4)
-      })
-      
-      ### tests/testthat/test-multiply.R ----
-      
-      test_that("multiply works", {
+      test_that("dir.example::multiply() works", {
         expect_equal(multiply(2, 3), 6)
       })
       
@@ -267,8 +274,7 @@
 # use_dir_package gives us the new objects, undocumented at this point
 
     Code
-      use_dir_package("greetings", "math", "inst/not_build_ignored", "R/r_subfolder",
-        patch = TRUE)
+      use_dir_package("greetings", "math", "inst/not_build_ignored", patch = TRUE)
     Message
       i Editing '.RProfile'
       i Loading dir.example
@@ -320,8 +326,9 @@
     Output
       v | F W  S  OK | Context
       
-      / |          0 | multiply                                                       
-      v |          1 | multiply
+      / |          0 | nested-test-scripts                                            
+      / |          0 | math/simple_math/multiply                                      
+      v |          1 | math/simple_math/multiply
       
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]

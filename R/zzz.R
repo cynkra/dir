@@ -18,17 +18,23 @@ covr_package_coverage <- NULL
 .onLoad <- function(...) {
   options(dir.test_structure = getOption("dir.test_structure", "nested"))
   # patch only if not patched yet, to avoid circularity
-  if (is.null(usethis_use_test)) usethis_use_test <<- usethis::use_test
+  backup("usethis", "use_test")
+  backup("usethis", "use_r")
+  backup("devtools", "document")
+  backup("devtools", "build")
+  backup("devtools", "check")
+  backup("devtools", "test_active_file")
+  backup("covr", "report")
+  backup("covr", "package_coverage")
+}
 
-  if (is.null(usethis_use_r)) usethis_use_r <<- usethis::use_r
-
-  if (is.null(devtools_document)) devtools_document <<- devtools::document
-  if (is.null(devtools_build)) devtools_build <<- devtools::build
-  if (is.null(devtools_check)) devtools_check <<- devtools::check
-  if (is.null(devtools_test_active_file)) devtools_test_active_file <<- devtools::test_active_file
-
-  if (is.null(covr_report)) covr_report <<- covr::report
-  if (is.null(covr_package_coverage)) covr_package_coverage <<- covr::package_coverage
+backup <- function(pkg, fun) {
+  original <- getFromNamespace(fun, pkg)
+  original_is_already_patched <- !is.null(attr(original, "original_source"))
+  if (original_is_already_patched) original <- attr(original, "original_source")
+  original_is_still_patched <- !is.null(attr(original, "original_source"))
+  nm <- paste0(pkg, "_", fun)
+  assign(nm, original, asNamespace("dir"))
 }
 
 globalVariables(c("find_active_file"))

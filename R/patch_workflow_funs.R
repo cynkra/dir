@@ -1,43 +1,40 @@
 patch_workflow_funs <- function() {
   cli::cli_inform(c(i = "Patching 'usethis', 'devtools' and 'covr' functions"))
 
-  # To avoid notes, justified because:
-  # * It's documented clearly
-  # * The user needs to opt in
-  # * The package is not intended to be programmed around so no surprise propagation
-  unlock_binding <- get("unlockBinding")
-  lock_binding <- get("lockBinding")
-  assign_in_namespace <- get("assignInNamespace")
+  patch("usethis", "use_test", use_test_for_patch)
+  patch("usethis", "use_r", use_r_for_patch)
+  patch("devtools", "document", document_for_patch)
+  patch("devtools", "check", check_for_patch)
+  patch("devtools", "build", build_for_patch)
+  patch("devtools", "test_active_file", test_active_file_for_patch)
+  patch("covr", "report", report_for_patch)
+  patch("covr", "package_coverage", package_coverage_for_patch)
+}
 
-  usethis <- asNamespace("usethis")
-  unlock_binding("use_test", usethis)
-  unlock_binding("use_r", usethis)
-  assign_in_namespace("use_r", use_r_for_patch, usethis)
-  assign_in_namespace("use_test", use_test_for_patch, usethis)
-  lock_binding("use_test", usethis)
-  lock_binding("use_r", usethis)
+# To avoid notes, justified because:
+# * It's documented clearly
+# * The user needs to opt in
+# * The package is not intended to be programmed around so no surprise propagation
+unlock_binding <- get("unlockBinding")
+lock_binding <- get("lockBinding")
+assign_in_namespace <- get("assignInNamespace")
 
-  devtools <- asNamespace("devtools")
-  unlock_binding("document", devtools)
-  unlock_binding("check", devtools)
-  unlock_binding("build", devtools)
-  unlock_binding("test_active_file", devtools)
-  assign_in_namespace("document", document_for_patch, devtools)
-  assign_in_namespace("check", check_for_patch, devtools)
-  assign_in_namespace("build", build_for_patch, devtools)
-  assign_in_namespace("test_active_file", test_active_file_for_patch, devtools)
-  lock_binding("document", devtools)
-  lock_binding("check", devtools)
-  lock_binding("build", devtools)
-  lock_binding("test_active_file", devtools)
+patch <- function(ns, target, replacement) {
+  ns <- asNamespace(ns)
+  original <- ns[[target]]
+  original_is_already_patched <- !is.null(attr(original, "original_source"))
+  if (original_is_already_patched) return(invisible(NULL))
+  attr(replacement, "original_source") <- original
+  unlock_binding(target, ns)
+  assign_in_namespace(target, replacement, ns)
+  lock_binding(target, ns)
+}
 
-  covr <- asNamespace("covr")
-  unlock_binding("report", covr)
-  unlock_binding("package_coverage", covr)
-  assign_in_namespace("report", report_for_patch, covr)
-  assign_in_namespace("package_coverage", package_coverage_for_patch, covr)
-  lock_binding("report", covr)
-  lock_binding("package_coverage", covr)
+unpatch <- function(ns, target) {
+  ns <- asNamespace(ns)
+  fun <- ns[[target]]
+  target_is_patched <- !is.null(attr(fun, "original_source"))
+  if (target_is_patched) assign_in_namespace(target, attr(fun, "original_source"), ns)
 }
 
 use_r_for_patch <- function(name = NULL, open = rlang::is_interactive()) {

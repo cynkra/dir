@@ -117,29 +117,7 @@ use_test_nested <- function(path, open) {
     }
   )
 
-  # handle nested test structure : test file runner
-  update_test_runner_file()
   edit_file(dest_path, open)
-}
-
-
-update_test_runner_file <- function() {
-  all_test_files <- setdiff(
-    list.files("tests/testthat", recursive = TRUE),
-    list.files("tests/testthat")
-  )
-  code_fun <- c(
-    'source_with_context <- function(x) {',
-    '  testthat::context_start_file(sub("test-([^/]+)$", "\\\\1", x))',
-    '  source(x, local = TRUE)',
-    '}'
-  )
-  code <- c(
-    code_fun,
-    sprintf('source_with_context("%s")', all_test_files)
-  )
-
-  writeLines(code, "tests/testthat/helper-nested-files.R")
 }
 
 # modified from usethis

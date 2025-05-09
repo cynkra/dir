@@ -2,8 +2,9 @@
 #'
 #' @description
 #'
-#' `add()` makes sure scripts stored outside of the "R" folder are added to `.Rbuildignore`
-#' and turns these scripts into objects stored in `R/sysdata.rda`.
+#' `add()` adds to `.Rbuildignore` scripts that aren't under "inst" or directly under "R",
+#'  and then turns into objects stored in `R/sysdata.rda` the scripts that are
+#'  under R subfolders or manually added.
 #' `use_dir_package()` will place a call to `dir::add()` in your ".RProfile".
 #' You shouldn't need to call it manually.
 #'
@@ -32,7 +33,9 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
 
   cli::cli_inform(c(i = "Loading external and nested folders"))
   # setup ======================================================================
-  dirs <- sort(unlist(list(...)))
+  r_subfolders <- fs::dir_ls("R", type = "directory")
+  provided_folders <- unlist(list(...))
+  dirs <- sort(unique(fs::path_norm(c(r_subfolders, provided_folders))))
   globals$dirs <- dirs
   globals$recursive <- recursive
   dirs_exist <- sapply(dirs, dir.exists)
@@ -43,17 +46,6 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   }
   files <- unlist(lapply(dirs, list.files, recursive = recursive, full.names = TRUE, pattern = "\\.[Rr]$"))
   files <- grep("/_", files, invert = TRUE, value = TRUE)
-
-  ### below commented because it makes roxygenize remove files before they're parsed
-  # # happens when reloading automatically through document
-  # # also to be safe and recover from bugs
-  # directory_already_flattened <-
-  #   !length(files) && any(grepl("--", list.files("R", pattern = "[.][rR]$")))
-  # if (directory_already_flattened) {
-  #   renamed_files <- grep("--", fs::dir_ls("R", regexp = "[.][rR]$"), value = TRUE)
-  #   files <- gsub("--", "/", fs::path_rel(renamed_files, "R"))
-  #   fs::file_move(renamed_files, files)
-  # }
 
   # update .Rbuildignore  ======================================================
   update_build_ignore(dirs)
@@ -71,34 +63,7 @@ add <- function(..., recursive = TRUE, patch = FALSE) {
   })
   save(list = names(e), file = "R/sysdata.rda", envir = as.environment(objs), compress = "bzip2", version = 3, ascii = FALSE)
 
-  # # update the namespace with these values =====================================
-  # # sysdata.rda was already read when we call add() so we move them to the namespace manually
-  # # this is safe, that's applied on the package under development
-  # unlock_binding <- get("unlockBinding")
-  # lock_binding <- get("lockBinding")
-  # for (nm in intersect(names(objs), names(ns))) {
-  #   unlock_binding(nm, ns)
-  # }
-  # list2env(objs, ns)
-  # for (nm in names(objs)) {
-  #   lock_binding(nm, ns)
-  # }
-
   globals$skip <- TRUE
 
   devtools::load_all(".", quiet = TRUE)
-
-  # patch workflow functions ===================================================
-  # if (patch) patch_workflow_funs()
-
-  # document ===================================================================
-  # renamed_files <- file.path("R", gsub("/", "--", files))
-  # file.rename(files, renamed_files)
-  # on.exit(file.rename(renamed_files, files))
-  # load_code is set so the code is not reloaded after reoxygenize()
-
-  # cli::cli_inform(c(i = "Updating documentation"))
-  # roxygen2::roxygenize(".", load_code = function(x) ns)
-
-  # pkgload::dev_topic_index_reset(".")
 }
